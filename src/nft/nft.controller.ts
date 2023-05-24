@@ -4,12 +4,14 @@ import { CreateNftDto } from './dto/create-nft.dto';
 import { UpdateNftDto } from './dto/update-nft.dto';
 import { FindNftDto } from './dto/find-nft.dto';
 import { Nft } from './entities/nft.entity';
+import { FindMetauriDto } from '../metauri/dto/find-metauri.dto';
+import { CreateMetauriDto } from '../metauri/dto/create-metauri.dto';
+import {MetauriService } from '../metauri/metauri.service';
 import { IrisBase } from "../client/baseClient";
 
 @Controller('api/nft')
 export class NftController {
-
-	constructor(private readonly nftService: NftService) {
+	constructor(private readonly nftService: NftService, private readonly metauriService: MetauriService) {
 	}
 
 
@@ -85,6 +87,7 @@ export class NftController {
 		var curl = 'curl https://rest.origin.uptick.network/uptick/collection/nfts?owner='+owner
 		console.log(curl)
 		var service = this.nftService;
+		var mService = this.metauriService;
 		var child = child_process.exec(curl, function(err, stdout, stderr) {
 		
 			return stdout;
@@ -109,12 +112,29 @@ export class NftController {
 					createNftDto.owner = owner
 					createNftDto.nftAddress = denom.denom_id
 					createNftDto.nftId = token
+					console.log(token)
+					if(denom.denom_id.startsWith("ibc/")){
+						
+						mService.findBynftID(token).then(function(meta){
+							if(meta!=null&&meta.name!=null){
+								createNftDto.name=meta.name
+								createNftDto.imgUrl=meta.imgUrl
+								createNftDto.description=meta.description
+								createNftDto.metadataUrl=meta.metadataUrl
+								service.create(createNftDto)
+								
+							}else{
+								service.create(createNftDto)
+							}
+						})
+						
+					}else{
 					var curltoken = 'curl https://rest.origin.uptick.network/uptick/collection/nfts/' + denom.denom_id + '/' + token
-		
+							
 					var tokens = child_process.exec(curltoken, function(err0, stdout, tokenerr) {
-		
+							
 						return stdout
-					});
+					});	
 					tokens.stdout.on('data', function(data0) {
 						// console.log(data0)
 						let uptickToken = JSON.parse(data0.toString());
@@ -130,17 +150,20 @@ export class NftController {
 								createNftDto.imgUrl = metaJson.image
 								createNftDto.description = metaJson.description
 								createNftDto.creator = metaJson.minter
-		
+							
 								service.create(createNftDto)
 								console.log(createNftDto)
 							});
-		
+							
 						} else {
 							service.create(createNftDto)
 							
 						}
-		
+							
 					})
+					}
+
+		
 				}
 		
 			}
@@ -324,6 +347,21 @@ var child_process = require("child_process");
 			"list": list
 		}
 		if (list && list.length > 0) {
+			if(createNftDto.chainType=="gon-irishub-1"){
+				// 临时方案，解决跨链后无法获取资产信息
+				let createMetauri=new CreateMetauriDto();
+				createMetauri.chainType=createNftDto.chainType
+				createMetauri.nftAddress=createNftDto.nftAddress
+				createMetauri.nftId=createNftDto.nftId
+				createMetauri.name=createNftDto.name
+				createMetauri.imgUrl=createNftDto.imgUrl
+				createMetauri.metadataUrl=createNftDto.metadataUrl
+				createMetauri.description=createNftDto.description
+				await this.metauriService.create(createMetauri);
+				
+			}
+			
+			
 			jsonResult.code = 0
 		}
 

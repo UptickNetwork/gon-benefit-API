@@ -2,6 +2,7 @@ import { Module} from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { NftModule } from './nft/nft.module';
+import { MatauriModule } from './metauri/metauri.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { NftModule } from './nft/nft.module';
       synchronize: true,
     }),
     UserModule,
-	NftModule
+	NftModule,
+	MatauriModule
   ]
 })
 export class AppModule {}

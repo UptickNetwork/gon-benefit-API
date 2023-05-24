@@ -3,9 +3,10 @@ import { NftService } from './nft.service';
 import { NftController } from './nft.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Nft } from './entities/nft.entity';
+import {MatauriModule } from 'src/metauri/metauri.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Nft])],
+  imports: [TypeOrmModule.forFeature([Nft]),MatauriModule],
   controllers: [NftController],
   providers: [NftService]
 })
