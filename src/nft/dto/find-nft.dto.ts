@@ -2,6 +2,7 @@
 export class FindNftDto {
   chainType: string;
     
+    id: number;
     name: string;
    
     nftAddress: string;

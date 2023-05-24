@@ -5,7 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { FindUserDto } from './dto/find-user.dto';
 import { User } from './entities/user.entity';
 
-@Controller('user')
+@Controller('api/user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -30,7 +30,16 @@ export class UserController {
   @Get('info')
   async findOneByaddress(@Query('address') address: string) {
 	let findUserDto=new FindUserDto();
-	findUserDto.address=address
+	if(address.startsWith("iaa")){
+		findUserDto.address=address
+	}else if(address.startsWith("uptick")){
+		findUserDto.uptickAddress=address
+	}else{
+		return {
+	    	"code":1,
+	    }
+	}
+	
 	  // https://blog.csdn.net/qq1195566313/article/details/127590610
 	 let obj= await this.userService.findOneByaddress(findUserDto);
 	 let code=1;

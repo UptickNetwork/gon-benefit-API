@@ -18,10 +18,10 @@ export class Nft{
 	@Column({ nullable: true })
 	nftId: string;
 	
-    @Column({ nullable: true })
+    @Column({ nullable: true, type: 'longtext'  })
     description: string;
 	
-    @Column()
+    @Column({ nullable: true })
     creator: string;
 	
     @Column({ nullable: true })
