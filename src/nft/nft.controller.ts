@@ -82,7 +82,7 @@ export class NftController {
 		
 		var child_process = require("child_process");
 		
-		var curl = 'curl http://52.74.190.214:1317/uptick/collection/nfts?owner='+owner
+		var curl = 'curl https://rest.origin.uptick.network/uptick/collection/nfts?owner='+owner
 		console.log(curl)
 		var service = this.nftService;
 		var child = child_process.exec(curl, function(err, stdout, stderr) {
@@ -105,11 +105,11 @@ export class NftController {
 						continue
 					}
 					let createNftDto = new CreateNftDto()
-					createNftDto.chainType = "uptick_7000-1"
+					createNftDto.chainType = "origin_1170-1"
 					createNftDto.owner = owner
 					createNftDto.nftAddress = denom.denom_id
 					createNftDto.nftId = token
-					var curltoken = 'curl http://52.74.190.214:1317/uptick/collection/nfts/' + denom.denom_id + '/' + token
+					var curltoken = 'curl https://rest.origin.uptick.network/uptick/collection/nfts/' + denom.denom_id + '/' + token
 		
 					var tokens = child_process.exec(curltoken, function(err0, stdout, tokenerr) {
 		
@@ -348,14 +348,15 @@ var child_process = require("child_process");
 	@Post('searchPage')
 	async searchPage(@Query("type") type: number, @Body() findNftDto: FindNftDto) {
 		let list = null
-		if (type == 0) {
-			list = await this.nftService.findOneByaddress(findNftDto);
-		} else if (type == 1) {
-			findNftDto.creator = findNftDto.owner
-			list = await this.nftService.findOneByaddress(findNftDto);
-		} else if (type == 2) {
-			list = await this.nftService.findByParam(findNftDto);
-		}
+		// if (type == 0) {
+		// 	list = await this.nftService.findOneByaddress(findNftDto);
+		// } else if (type == 1) {
+		// 	findNftDto.creator = findNftDto.owner
+		// 	list = await this.nftService.findOneByaddress(findNftDto);
+		// } else if (type == 2) {
+			
+		// }
+		list = await this.nftService.findByParam(type,findNftDto);
 
 		let jsonResult = {
 			"code": 0,

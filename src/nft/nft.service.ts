@@ -68,9 +68,10 @@ export class NftService {
 		return await this.nftRepository.find(findNftDto);
 	}
 
-	async findByParam(findNftDto: FindNftDto) {
-
-		return await this.nftRepository.query("select * from nft where chainType=? and owner=? and creator!=? order by id desc", [findNftDto.chainType, findNftDto.owner, findNftDto.owner]);
+	async findByParam(type:number,findNftDto: FindNftDto) {
+		let sql="select * from nft where chainType=? and owner=? and imgUrl is not null order by id desc"
+		
+		return await this.nftRepository.query(sql, [findNftDto.chainType, findNftDto.owner, findNftDto.owner]);
 	}
 
 
