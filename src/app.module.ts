@@ -1,6 +1,5 @@
 import { Module} from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { NotesModule } from './notes/notes.module';
 import { UserModule } from './user/user.module';
 import { NftModule } from './nft/nft.module';
 
@@ -16,7 +15,6 @@ import { NftModule } from './nft/nft.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    NotesModule,
     UserModule,
 	NftModule
   ]

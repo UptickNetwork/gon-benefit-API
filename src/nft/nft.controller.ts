@@ -1,4 +1,4 @@
-  import { Controller, Get, Post, Body, Param,Query, Delete } from '@nestjs/common'
+import { Controller, Get, Post, Body, Param,Query, Delete } from '@nestjs/common'
 import { NftService } from './nft.service';
 import { CreateNftDto } from './dto/create-nft.dto';
 import { UpdateNftDto } from './dto/update-nft.dto';
@@ -261,7 +261,6 @@ var child_process = require("child_process");
 				let removeinfo=listOldDemonToken[i];
 				console.log("removeinfo=== "+removeinfo)
 				if(!listNewDemonToken.includes(removeinfo)){
-					console.log("remove99999999== ")
 					// 旧的token 不在新的token 内,就删除
 					let removeinfos=removeinfo.split(",")
 					
