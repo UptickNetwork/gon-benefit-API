@@ -4,7 +4,6 @@ import { CreateNftDto } from './dto/create-nft.dto';
 import { UpdateNftDto } from './dto/update-nft.dto';
 import { FindNftDto } from './dto/find-nft.dto';
 import { Nft } from './entities/nft.entity';
-import { FindMetauriDto } from '../metauri/dto/find-metauri.dto';
 import { CreateMetauriDto } from '../metauri/dto/create-metauri.dto';
 import {MetauriService } from '../metauri/metauri.service';
 import { IrisBase } from "../client/baseClient";
@@ -17,7 +16,6 @@ export class NftController {
 
 	@Post('edit')
 	async update(@Body() updateNftDto: UpdateNftDto) {
-		console.log("assss")
 		let nft = new Nft()
 		let list = []
 		let findNftDto = new FindNftDto();
@@ -45,6 +43,42 @@ export class NftController {
 		return jsonResult
 
 	}
+
+	@Post('cosmosConvertEVM')
+	async convert(@Query('evmOwner') evmOwner: string,@Query('evmNftAddress') evmNftAddress: string,@Query('evmNftId') evmNftId: string,@Body() updateNftDto: UpdateNftDto) {
+		
+		console.log(updateNftDto)
+		let nft = new Nft()
+		let list = []
+		let findNftDto = new FindNftDto();
+		findNftDto.nftAddress = updateNftDto.nftAddress
+		findNftDto.nftId = updateNftDto.nftId
+		findNftDto.owner = updateNftDto.owner
+		list = await this.nftService.findOneByaddress(findNftDto);
+		if (list && list.length > 0) {
+			nft = list[0]
+			updateNftDto.owner=evmOwner
+			updateNftDto.nftAddress=evmNftAddress
+			updateNftDto.nftId=evmNftId
+			await this.nftService.update(nft.id, updateNftDto);
+			
+			// findNftDto = await this.nftService.findOne(nft.id);
+			
+		}
+
+		let code = 1;
+
+		if (nft && nft.id > 0) {
+			code = 0
+		}
+		let jsonResult = {
+			"code": code,
+			"obj": nft
+		}
+		return jsonResult
+
+	}
+
 	@Get('updateUser')
 	async updateUser(@Query('owner') owner: string) {
 		
@@ -236,7 +270,8 @@ var child_process = require("child_process");
 				 createNftDto.chainType='gon-irishub-1'
 				 createNftDto.owner=owner
 				 createNftDto.nftAddress=denom.denomId 
-			 	createNftDto.nftId=token
+			 	createNftDto.nftId=token	
+		
 			 	client.nft.queryNFT(denom.denomId,token)
 			 	.then(function(restoken){
 					console.log(denom.denomId)
@@ -282,7 +317,7 @@ var child_process = require("child_process");
 			// 比较新旧的list 去掉多余的
 			for(let i=0;i<listOldDemonToken.length;i++){
 				let removeinfo=listOldDemonToken[i];
-				console.log("removeinfo=== "+removeinfo)
+				// console.log("removeinfo=== "+removeinfo)
 				if(!listNewDemonToken.includes(removeinfo)){
 					// 旧的token 不在新的token 内,就删除
 					let removeinfos=removeinfo.split(",")
