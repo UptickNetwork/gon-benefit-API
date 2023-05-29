@@ -18,6 +18,10 @@ export class CreateNftDto {
 	metadataUrl: string;
 	
 	hash: string;
+	price: string;
+	startTime: number;
+	endTime: number;
+	period: number;
 	
 	createTime: Date;
 	

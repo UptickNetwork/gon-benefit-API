@@ -79,6 +79,127 @@ export class NftController {
 
 	}
 
+// 质押
+	@Post('pledge')
+	async pledge(@Body() updateNftDto: UpdateNftDto) {
+		// status  0或者空是 未质押
+		// status  1已质押
+		// status  2已续期
+		// status  3已过期
+		
+		let nft = new Nft()
+		let list = []
+		let findNftDto = new FindNftDto();
+		findNftDto.nftAddress = updateNftDto.nftAddress
+		findNftDto.nftId = updateNftDto.nftId
+		list = await this.nftService.findOneByaddress(findNftDto);
+		if (list && list.length > 0) {
+			nft = list[0]
+			if(updateNftDto.startTime!=null&&updateNftDto.period!=null&&updateNftDto.endTime==null){
+				updateNftDto.endTime=Number(updateNftDto.startTime)+Number(updateNftDto.period)
+				
+			}
+			await this.nftService.update(nft.id, updateNftDto);
+			list = await this.nftService.findOneByaddress(findNftDto);
+			if (list && list.length > 0) {
+				nft = list[0]
+			}
+		}
+
+		let code = 1;
+
+		if (nft && nft.id > 0) {
+			code = 0
+		}
+		let jsonResult = {
+			"code": code,
+			"obj": nft
+		}
+		return jsonResult
+
+	}
+	// 赎回NFT
+	@Post('redeem')
+	async redeem(@Body() updateNftDto: UpdateNftDto) {
+		// status  0或者空是 未质押
+		// status  1已质押
+		// status  2已续期
+		// status  3已过期
+		
+		let nft = new Nft()
+		let list = []
+		let findNftDto = new FindNftDto();
+		findNftDto.nftAddress = updateNftDto.nftAddress
+		findNftDto.nftId = updateNftDto.nftId
+		findNftDto.owner = updateNftDto.owner
+		list = await this.nftService.findOneByaddress(findNftDto);
+		if (list && list.length > 0) {
+			nft = list[0]
+			let updateNftDto2=new UpdateNftDto();
+			updateNftDto2.status=0
+			updateNftDto2.endTime=null
+			updateNftDto2.startTime=null
+			updateNftDto2.period=null
+			updateNftDto2.hash=updateNftDto.hash
+			await this.nftService.update(nft.id, updateNftDto2);
+			list = await this.nftService.findOneByaddress(findNftDto);
+			if (list && list.length > 0) {
+				nft = list[0]
+			}
+		}
+	
+		let code = 1;
+	
+		if (nft && nft.id > 0) {
+			code = 0
+		}
+		let jsonResult = {
+			"code": code,
+			"obj": nft
+		}
+		return jsonResult
+	
+	}
+	// 延期
+	@Post('renewal')
+	async renewal(@Body() updateNftDto: UpdateNftDto) {
+		// status  0或者空是 未质押
+		// status  1已质押
+		// status  2已续期
+		// status  3已过期
+		
+		let nft = new Nft()
+		let list = []
+		let findNftDto = new FindNftDto();
+		findNftDto.nftAddress = updateNftDto.nftAddress
+		findNftDto.nftId = updateNftDto.nftId
+		findNftDto.owner = updateNftDto.owner
+		list = await this.nftService.findOneByaddress(findNftDto);
+		if (list && list.length > 0) {
+			nft = list[0]
+			let updateNftDto2=new UpdateNftDto();
+			updateNftDto2.status=2
+			updateNftDto2.hash=updateNftDto.hash
+			updateNftDto2.endTime=Number(nft.endTime)+Number(nft.period)
+			await this.nftService.update(nft.id, updateNftDto2);
+			list = await this.nftService.findOneByaddress(findNftDto);
+			if (list && list.length > 0) {
+				nft = list[0]
+			}
+		}
+	
+		let code = 1;
+	
+		if (nft && nft.id > 0) {
+			code = 0
+		}
+		let jsonResult = {
+			"code": code,
+			"obj": nft
+		}
+		return jsonResult
+	
+	}
 	@Get('updateUser')
 	async updateUser(@Query('owner') owner: string) {
 		

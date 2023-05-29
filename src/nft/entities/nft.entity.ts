@@ -37,7 +37,20 @@ export class Nft{
     hash: string;
 	
     @Column({ nullable: true })
-    status: number;
+    status: number;      // status  0或者空是 未质押 1已质押 2已续期3已过期
+	
+	
+	@Column({ nullable: true })
+	price: string;
+	
+	@Column({ nullable: true })
+	startTime: number;
+	
+	@Column({ nullable: true })
+	endTime: number;
+	
+	@Column({ nullable: true })
+	period: number;
 	
     @CreateDateColumn({ type: 'timestamp' })
     createTime: Date;

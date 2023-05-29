@@ -16,6 +16,10 @@ export class FindNftDto {
     imgUrl: string;
    
     metadataUrl: string;
+	price: string;
+	startTime: number;
+	endTime: number;
+	period: number;
 	
 }
   

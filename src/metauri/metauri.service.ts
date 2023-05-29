@@ -29,11 +29,15 @@ export class MetauriService {
 	}
 
 	async findBynftID(nftId: string) {
-		let findMetauriDto = new FindMetauriDto()
-		findMetauriDto.nftId = nftId
-
-		return await this.metauriRepository.findOne(findMetauriDto);
+	let sql="select * from metauri where nftId like '%"+nftId+"%' order by id desc"
+	let list=await this.metauriRepository.query(sql, []);
+	if(list!=null&&list.length>0){
+		return list[0]
 	}
+	console.log(list)
+		return null
+	}
+
 
 	async removeMetauri(metauri: Metauri) {
 
