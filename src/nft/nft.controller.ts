@@ -44,9 +44,9 @@ export class NftController {
 
 	}
 
-	@Post('cosmosConvertEVM')
-	async convert(@Query('evmOwner') evmOwner: string,@Query('evmNftAddress') evmNftAddress: string,@Query('evmNftId') evmNftId: string,@Body() updateNftDto: UpdateNftDto) {
-		
+	@Post('evmConvertCosmos')
+	async convert2Cosmos(@Query('uptickOwner') uptickOwner: string,@Query('uptickNftAddress') uptickNftAddress: string,@Query('uptickNftId') uptickNftId: string,@Body() updateNftDto: UpdateNftDto) {
+		console.log("=====")
 		console.log(updateNftDto)
 		let nft = new Nft()
 		let list = []
@@ -57,9 +57,10 @@ export class NftController {
 		list = await this.nftService.findOneByaddress(findNftDto);
 		if (list && list.length > 0) {
 			nft = list[0]
-			updateNftDto.owner=evmOwner
-			updateNftDto.nftAddress=evmNftAddress
-			updateNftDto.nftId=evmNftId
+			updateNftDto.owner=uptickOwner
+			updateNftDto.nftAddress=uptickNftAddress
+			updateNftDto.nftId=uptickNftId
+			 updateNftDto.chainType = "origin_1170-1"
 			await this.nftService.update(nft.id, updateNftDto);
 			
 			// findNftDto = await this.nftService.findOne(nft.id);
@@ -79,127 +80,43 @@ export class NftController {
 
 	}
 
-// 质押
-	@Post('pledge')
-	async pledge(@Body() updateNftDto: UpdateNftDto) {
-		// status  0或者空是 未质押
-		// status  1已质押
-		// status  2已续期
-		// status  3已过期
-		
-		let nft = new Nft()
-		let list = []
-		let findNftDto = new FindNftDto();
-		findNftDto.nftAddress = updateNftDto.nftAddress
-		findNftDto.nftId = updateNftDto.nftId
-		list = await this.nftService.findOneByaddress(findNftDto);
-		if (list && list.length > 0) {
-			nft = list[0]
-			if(updateNftDto.startTime!=null&&updateNftDto.period!=null&&updateNftDto.endTime==null){
-				updateNftDto.endTime=Number(updateNftDto.startTime)+Number(updateNftDto.period)
-				
-			}
-			await this.nftService.update(nft.id, updateNftDto);
-			list = await this.nftService.findOneByaddress(findNftDto);
-			if (list && list.length > 0) {
-				nft = list[0]
-			}
-		}
-
-		let code = 1;
-
-		if (nft && nft.id > 0) {
-			code = 0
-		}
-		let jsonResult = {
-			"code": code,
-			"obj": nft
-		}
-		return jsonResult
-
-	}
-	// 赎回NFT
-	@Post('redeem')
-	async redeem(@Body() updateNftDto: UpdateNftDto) {
-		// status  0或者空是 未质押
-		// status  1已质押
-		// status  2已续期
-		// status  3已过期
-		
-		let nft = new Nft()
-		let list = []
-		let findNftDto = new FindNftDto();
-		findNftDto.nftAddress = updateNftDto.nftAddress
-		findNftDto.nftId = updateNftDto.nftId
-		findNftDto.owner = updateNftDto.owner
-		list = await this.nftService.findOneByaddress(findNftDto);
-		if (list && list.length > 0) {
-			nft = list[0]
-			let updateNftDto2=new UpdateNftDto();
-			updateNftDto2.status=0
-			updateNftDto2.endTime=null
-			updateNftDto2.startTime=null
-			updateNftDto2.period=null
-			updateNftDto2.hash=updateNftDto.hash
-			await this.nftService.update(nft.id, updateNftDto2);
-			list = await this.nftService.findOneByaddress(findNftDto);
-			if (list && list.length > 0) {
-				nft = list[0]
-			}
-		}
+	@Post('/cosmosConvertEVM')
+	async convert2EVM(@Query('evmOwner') evmOwner: string, @Query('evmNftAddress') evmNftAddress: string, @Query('evmNftId') evmNftId: string, @Body() updateNftDto: UpdateNftDto) {
 	
-		let code = 1;
+	console.log("/nft/cosmosConvertEVM")
+	console.log("evmOwner",evmOwner,evmNftAddress,evmNftId)
+	console.log(updateNftDto)
 	
-		if (nft && nft.id > 0) {
-			code = 0
-		}
-		let jsonResult = {
-			"code": code,
-			"obj": nft
-		}
-		return jsonResult
+	    let jsonResult = {
+	        "code": 0,
+	        "obj": null,
+	        "error": "",
+	    }
+	
+	    let findNftDto = new FindNftDto();
+	    findNftDto.nftAddress = updateNftDto.nftAddress
+	    findNftDto.nftId = updateNftDto.nftId
+	    findNftDto.owner = updateNftDto.owner
+	  let list = await this.nftService.findOneByaddress(findNftDto);
+	  if (list && list.length > 0) {
+		  let nft = new Nft()
+			nft = list[0]
+	        updateNftDto.owner = evmOwner
+	        updateNftDto.nftAddress = evmNftAddress
+	        updateNftDto.nftId = evmNftId
+	        updateNftDto.chainType = "1170"
+	        await this.nftService.update(nft.id, updateNftDto);
+	
+	    } else {
+	        jsonResult.code = -1;
+	        jsonResult.error = "Parameter error!";
+	    }
+	
+	    return jsonResult
 	
 	}
-	// 延期
-	@Post('renewal')
-	async renewal(@Body() updateNftDto: UpdateNftDto) {
-		// status  0或者空是 未质押
-		// status  1已质押
-		// status  2已续期
-		// status  3已过期
-		
-		let nft = new Nft()
-		let list = []
-		let findNftDto = new FindNftDto();
-		findNftDto.nftAddress = updateNftDto.nftAddress
-		findNftDto.nftId = updateNftDto.nftId
-		findNftDto.owner = updateNftDto.owner
-		list = await this.nftService.findOneByaddress(findNftDto);
-		if (list && list.length > 0) {
-			nft = list[0]
-			let updateNftDto2=new UpdateNftDto();
-			updateNftDto2.status=2
-			updateNftDto2.hash=updateNftDto.hash
-			updateNftDto2.endTime=Number(nft.endTime)+Number(nft.period)
-			await this.nftService.update(nft.id, updateNftDto2);
-			list = await this.nftService.findOneByaddress(findNftDto);
-			if (list && list.length > 0) {
-				nft = list[0]
-			}
-		}
 	
-		let code = 1;
 	
-		if (nft && nft.id > 0) {
-			code = 0
-		}
-		let jsonResult = {
-			"code": code,
-			"obj": nft
-		}
-		return jsonResult
-	
-	}
 	@Get('updateUser')
 	async updateUser(@Query('owner') owner: string) {
 		
@@ -239,7 +156,7 @@ export class NftController {
 		
 		var child_process = require("child_process");
 		
-		var curl = 'curl https://rest.origin.uptick.network/uptick/collection/nfts?owner='+owner
+		var curl = 'curl http://13.212.88.15:1317/uptick/collection/nfts?owner='+owner
 		console.log(curl)
 		var service = this.nftService;
 		var mService = this.metauriService;
@@ -284,7 +201,7 @@ export class NftController {
 						})
 						
 					}else{
-					var curltoken = 'curl https://rest.origin.uptick.network/uptick/collection/nfts/' + denom.denom_id + '/' + token
+					var curltoken = 'curl http://13.212.88.15:1317/uptick/collection/nfts/' + denom.denom_id + '/' + token
 							
 					var tokens = child_process.exec(curltoken, function(err0, stdout, tokenerr) {
 							
@@ -348,8 +265,8 @@ export class NftController {
 	
 	let client: any;
 	let irisParam = {
-		node: "http://34.80.93.133:26657/",
-		chainID: "gon-irishub-1",
+		node: "https://rpc.nyancat.rainbow.one/",
+		chainID: "unyan",
 		gas: "5138174",
 		amount: "100000",
 		denom: "uiris"
@@ -368,7 +285,7 @@ export class NftController {
 	);
 var child_process = require("child_process");
 		var service = this.nftService;
-		
+		var mService = this.metauriService;
 	let denoms=null;
   client.nft.queryOwner(owner)
 		 .then(function(res){ 
@@ -388,14 +305,13 @@ var child_process = require("child_process");
 				 }
 				 
 				 let createNftDto=new CreateNftDto()
-				 createNftDto.chainType='gon-irishub-1'
+				 createNftDto.chainType='unyan'
 				 createNftDto.owner=owner
 				 createNftDto.nftAddress=denom.denomId 
 			 	createNftDto.nftId=token	
 		
 			 	client.nft.queryNFT(denom.denomId,token)
 			 	.then(function(restoken){
-					console.log(denom.denomId)
 					console.log(restoken)
 			 		createNftDto.name=restoken.nft.name
 			 		createNftDto.metadataUrl=restoken.nft.uri
@@ -406,7 +322,6 @@ var child_process = require("child_process");
 							return metaJson
 						});
 						metadata.stdout.on('data', function(data1) {
-							console.log("metasssssssss")
 							console.log(data1)
 							let metaJson = JSON.parse(data1.toString());
 							createNftDto.name = metaJson.name
@@ -415,7 +330,22 @@ var child_process = require("child_process");
 							createNftDto.creator = metaJson.minter
 							
 							service.create(createNftDto)
-							// console.log(createNftDto)
+							
+							mService.findBynftID(token).then(function(meta){
+								if(meta==null){
+								let createMetauri=new CreateMetauriDto();
+								createMetauri.chainType=createNftDto.chainType
+								createMetauri.nftAddress=createNftDto.nftAddress
+								createMetauri.nftId=createNftDto.nftId
+								createMetauri.name=createNftDto.name
+								createMetauri.imgUrl=createNftDto.imgUrl
+								createMetauri.metadataUrl=createNftDto.metadataUrl
+								createMetauri.description=createNftDto.description
+								mService.create(createMetauri);
+									
+								}
+							})
+							
 						});
 							
 					}else{
@@ -503,7 +433,7 @@ var child_process = require("child_process");
 			"list": list
 		}
 		if (list && list.length > 0) {
-			if(createNftDto.chainType=="gon-irishub-1"){
+			if(createNftDto.chainType=="unyan"){
 				// 临时方案，解决跨链后无法获取资产信息
 				let createMetauri=new CreateMetauriDto();
 				createMetauri.chainType=createNftDto.chainType
