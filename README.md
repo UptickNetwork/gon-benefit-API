@@ -22,3 +22,5 @@ $ pm2 web                # 运行健壮的 computer API endpoint (http://localho
 $ pm2 delete 0           # 杀死指定的进程
 $ pm2 delete all         # 杀死全部进程
 
+
+
